@@ -1,5 +1,6 @@
 package provided;
 
+
 /**
  * This class is responsible for tokenizing Jott code.
  * 
@@ -7,6 +8,9 @@ package provided;
  **/
 
 import java.util.ArrayList;
+import java.util.Scanner;
+import java.io.File;
+import java.io.FileNotFoundException;
 
 public class JottTokenizer {
 
@@ -16,7 +20,37 @@ public class JottTokenizer {
      * @param filename the name of the file to tokenize; can be relative or absolute path
      * @return an ArrayList of Jott Tokens
      */
-    public static ArrayList<Token> tokenize(String filename){
+  public static ArrayList<Token> tokenize(String filename){
+    File file = new File(filename);
+    try(Scanner reader = new Scanner(file);){
+      while(reader.hasNextLine()){
+        String line = reader.nextLine();
+        for(int i = 0; i < line.length(); i++){
+          switch(line.charAt(i)){
+            case ' ':
+              break;
+            case ' ':
+              break;
+            case ' ':
+              break;
+            case ' ':
+              break;
+            case ' ':
+              break;
+            case ' ':
+              break;
+            
+          }
+        }
+        
+
+      }
+    } catch(FileNotFoundException e){
+      System.err.print(e);
+      return null;
+    }
+    
+  
 		return null;
 	}
 }
