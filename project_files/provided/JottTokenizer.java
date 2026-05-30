@@ -14,6 +14,7 @@ import java.io.FileNotFoundException;
 public class JottTokenizer {
 
     /**
+    /**
      * Takes in a filename and tokenizes that file into Tokens
      * based on the rules of the Jott Language
      * @param filename the name of the file to tokenize; can be relative or absolute path
@@ -133,18 +134,17 @@ public class JottTokenizer {
                 // TODO: implement string literal scanning (stubbed intentionally)
                 break;
 
-              default:
-                // Multi-character sequences (identifiers, keywords, numbers, etc.)
-                // Scanning logic is intentionally left as a stub.
-                break;
+                        default:
+                            // Multi-character sequences (identifiers, keywords, numbers, etc.)
+                            break;
+                    }
+                }
             }
-          }
+        } catch (FileNotFoundException e) {
+            System.err.print(e);
+            return null;
         }
-      } catch (FileNotFoundException e) {
-        System.err.print(e);
-        return null;
+
+        return mylist; // Returns your parsed collection safely!
     }
-    
-    return mylist; // Returns your parsed collection safely!
-	}
 }
