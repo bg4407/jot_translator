@@ -142,7 +142,10 @@ public class JottTokenizer {
                   i++;
                 }
 
+
                 mylist.add(new Token(keywordID, filename, lineNum, TokenType.ID_KEYWORD));
+
+                i--;
               }
 
               //parsing numbers
