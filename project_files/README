@@ -31,22 +31,6 @@ java -cp ../bin testers.JottParserTester
 
 ---
 
-## Files to change
-
-1. JottTokenizerTester.java
-   - add:
-     ```java
-     import provided.*;
-     ```
-
-2. JottParserTester.java
-   - add:
-     ```java
-     import provided.*;
-     ```
-
----
-
 ## Optional workspace-root fix
 
 If you want to run the testers directly from jot_translator instead of project_files, also update the test case paths in both tester files:
