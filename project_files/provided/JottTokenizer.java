@@ -127,10 +127,10 @@ public class JottTokenizer {
                             }
                             break;
 
-                        // String literals scanning logic
-                        case '"':
-                            // TODO: implement string literal scanning (stubbed intentionally)
-                            break;
+            // String literals scanning logic
+            case '"':
+              i = stringCase(line, i, filename, lineNum, mylist);
+              break;
 
             default:
               //parsing id/keywords
@@ -184,5 +184,32 @@ public class JottTokenizer {
     }
 
     return mylist; // Returns your parsed collection safely!
+  }
+
+  private static int stringCase(String line, int i, String filename, int lineNum, ArrayList<Token> tokens){
+    String str = "\"";
+    i++;
+    while (i < line.length() && line.charAt(i) != '"'){
+      char currentChar = line.charAt(i);
+      if(!Character.isLetterOrDigit(currentChar) && currentChar != ' '){
+        System.err.println("syntax error:");
+        System.err.println("invalid character in string: \"" + currentChar + "\"");
+        System.err.println(filename + ":" + lineNum);
+        return -1;
+      }
+      else{
+        str += currentChar;
+        i++;
+      }
+    }
+    if(i >= line.length()){
+      System.err.println("syntax error:");
+      System.err.println("quote never ended");
+      System.err.println(filename + ":" + lineNum);
+      return -1;
+    }
+    str += "\"";
+    tokens.add(new Token(str, filename, lineNum, TokenType.STRING));
+    return i;
   }
 }
