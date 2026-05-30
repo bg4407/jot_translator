@@ -21,14 +21,18 @@ public class JottTokenizer {
      * @return an ArrayList of Jott Tokens
      */
   public static ArrayList<Token> tokenize(String filename){
+    ArrayList<Token> mylist = new ArrayList<Token>();
     File file = new File(filename);
     try(Scanner reader = new Scanner(file);){
+      int lineNum = 0;
       while(reader.hasNextLine()){
-        String line = reader.nextLine();
+        lineNum++;
+        String line = reader.nextLine().strip();
         for(int i = 0; i < line.length(); i++){
           switch(line.charAt(i)){
             case '\n':
             case '\r':
+              lineNum++;
             case '\t':
             case ' ':
               break;
@@ -37,23 +41,34 @@ public class JottTokenizer {
               i = line.length();
               break;
             case ',':
-
+              mylist.add(new Token(",", filename, lineNum, TokenType.COMMA));
               break;
             case ']':
+              mylist.add(new Token("]", filename, lineNum, TokenType.R_BRACKET));
               break;
             case '[':
+              mylist.add(new Token("[", filename, lineNum, TokenType.L_BRACKET));
               break;
             case '}':
+              mylist.add(new Token("}", filename, lineNum, TokenType.R_BRACE));
+              break;
+            case '{':
+              mylist.add(new Token("{", filename, lineNum, TokenType.L_BRACE));
               break;
             case '/':
+              mylist.add(new Token("/", filename, lineNum, TokenType.MATH_OP));
               break;
             case '+':
+              mylist.add(new Token("+", filename, lineNum, TokenType.MATH_OP));
               break;
             case '-':
+              mylist.add(new Token("-", filename, lineNum, TokenType.MATH_OP));
               break;
             case '*':
+              mylist.add(new Token("*", filename, lineNum, TokenType.MATH_OP));
               break;
             case ';':
+              mylist.add(new Token(";", filename, lineNum, TokenType.SEMICOLON));
               break;
             case '':
               break;
