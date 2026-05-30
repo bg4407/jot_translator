@@ -27,17 +27,37 @@ public class JottTokenizer {
         String line = reader.nextLine();
         for(int i = 0; i < line.length(); i++){
           switch(line.charAt(i)){
+            case '\n':
+            case '\r':
+            case '\t':
             case ' ':
               break;
-            case ' ':
+            case '#':
+              //basically breaks the for loop
+              i = line.length();
               break;
-            case ' ':
+            case ',':
+
               break;
-            case ' ':
+            case ']':
               break;
-            case ' ':
+            case '[':
               break;
-            case ' ':
+            case '}':
+              break;
+            case '/':
+              break;
+            case '+':
+              break;
+            case '-':
+              break;
+            case '*':
+              break;
+            case ';':
+              break;
+            case '':
+              break;
+            case '':
               break;
             
           }
@@ -53,4 +73,5 @@ public class JottTokenizer {
   
 		return null;
 	}
+  
 }
