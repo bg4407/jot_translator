@@ -4,3 +4,59 @@ provided shouls be a top level package in your src directory
 JottParserTester and JottTokenizerTester classes should be in a package call testers.
 
 the testCases directories should be in the working directory of your project. 
+
+Setup guide
+
+I’m checking the current compile status and needed file changes so I can give you an exact fix list.
+
+Ran terminal command:  mkdir -p bin && javac -d bin project_files/provided/*.java project_files/testers/*.java
+
+Ran terminal command:  cd /workspaces/jot_translator/project_files && java -cp ../bin testers.JottTokenizerTester
+
+## Required commands
+
+From the repo root:
+
+```bash
+cd /workspaces/jot_translator
+mkdir -p bin
+javac -d bin project_files/provided/*.java project_files/testers/*.java
+```
+
+Then run testers from the directory that contains the test data:
+
+```bash
+cd project_files
+java -cp ../bin testers.JottTokenizerTester
+java -cp ../bin testers.JottParserTester
+```
+
+---
+
+## Files to change
+
+1. JottTokenizerTester.java
+   - add:
+     ```java
+     import provided.*;
+     ```
+
+2. JottParserTester.java
+   - add:
+     ```java
+     import provided.*;
+     ```
+
+---
+
+## Optional workspace-root fix
+
+If you want to run the testers directly from jot_translator instead of project_files, also update the test case paths in both tester files:
+
+- In JottTokenizerTester.java: change `tokenizerTestCases/...` to `project_files/tokenizerTestCases/...`
+- In JottParserTester.java: change `parserTestCases/...` to `project_files/parserTestCases/...`
+
+---
+
+## Notes
+- The test runner depends on the working directory, so `cd project_files` is the simplest fix.
