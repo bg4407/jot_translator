@@ -13,7 +13,7 @@ import java.io.FileNotFoundException;
 
 public class JottTokenizer {
 
-	/**
+    /**
      * Takes in a filename and tokenizes that file into Tokens
      * based on the rules of the Jott Language
      * @param filename the name of the file to tokenize; can be relative or absolute path
