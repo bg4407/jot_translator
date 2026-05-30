@@ -146,10 +146,8 @@ public class JottTokenizer {
                 mylist.add(new Token(keywordID, filename, lineNum, TokenType.ID_KEYWORD));
 
                 i--;
-              }
-
-              //parsing numbers
-              if (Character.isDigit(currentChar)) {
+              } else if (Character.isDigit(currentChar)) {
+                //parsing numbers
                 String num = "";
 
                 while (i < line.length() && Character.isDigit(line.charAt(i))) {
@@ -176,6 +174,11 @@ public class JottTokenizer {
 
                 i--;
                 mylist.add(new Token(num, filename, lineNum, TokenType.NUMBER));
+              } else{
+                System.err.println("Syntax Error:");
+                System.err.println("Invalid token \"" + currentChar + "\".");
+                System.err.println(filename + ":" + lineNum);
+                return null;
               }
               break;
           }
