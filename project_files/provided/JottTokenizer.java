@@ -3,7 +3,7 @@ package provided;
 /**
  * This class is responsible for tokenizing Jott code.
  * 
- * @author 
+ * @author Conner Meagher, Anindita Bhowmik, Borniel Gope, Jatin Jain
  **/
 
 import java.util.ArrayList;
