@@ -139,7 +139,6 @@ public class JottTokenizer {
                             if (Character.isAlphabetic(currentChar)){
                                 String keywordID = "";
 
-                                // FIXED: Added parentheses to bind the bounds-check to the entire loop logic
                                 while (i < line.length() && (Character.isDigit(line.charAt(i)) || Character.isAlphabetic(line.charAt(i)))) {
                                     keywordID += line.charAt(i);
                                     i++;
@@ -148,11 +147,11 @@ public class JottTokenizer {
                                 mylist.add(new Token(keywordID, filename, lineNum, TokenType.ID_KEYWORD));
                                 i--;
                             } 
-                            // FIXED: Added check for direct dot numbers (.5) matching the language DFA
+                            // Parsing numbers
                             else if (Character.isDigit(currentChar) || currentChar == '.') {
-                                // Parsing numbers
                                 String num = "";
 
+                                // Check for single dot error (e.g., "." standalone)
                                 if (currentChar == '.' && (i + 1 >= line.length() || !Character.isDigit(line.charAt(i + 1)))) {
                                     System.err.println("Syntax Error:");
                                     System.err.println("Invalid token \".\"");
@@ -165,13 +164,15 @@ public class JottTokenizer {
                                     i++;
                                 }
 
+                                // Check for decimal component
                                 if (i < line.length() && line.charAt(i) == '.') {
                                     num += line.charAt(i);
                                     i++;
 
-                                    if (i >= line.length() || !Character.isDigit(line.charAt(i))) {
+                                    // FIXED: If another dot follows sequentially, that's a structural syntax error
+                                    if (i < line.length() && line.charAt(i) == '.') {
                                         System.err.println("Syntax Error:");
-                                        System.err.println("Invalid number \"" + num + "\"");
+                                        System.err.println("Invalid number \"" + num + ".\"");
                                         System.err.println(filename + ":" + lineNum);
                                         return null;
                                     }
