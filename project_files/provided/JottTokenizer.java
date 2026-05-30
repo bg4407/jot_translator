@@ -141,6 +141,8 @@ public class JottTokenizer {
                   keywordID += line.charAt(i);
                   i++;
                 }
+
+                mylist.add(new Token(keywordID, filename, lineNum, TokenType.ID_KEYWORD));
               }
 
               //parsing numbers
