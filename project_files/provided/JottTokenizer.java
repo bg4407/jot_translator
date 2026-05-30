@@ -130,7 +130,7 @@ public class JottTokenizer {
 
             // String literals scanning logic
             case '"':
-              // TODO: implement string literal scanning (stubbed intentionally)
+              i = stringCase(line, i, filename, lineNum, mylist);
               break;
 
             default:
