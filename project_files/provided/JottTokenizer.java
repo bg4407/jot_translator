@@ -73,20 +73,78 @@ public class JottTokenizer {
                  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z':
               
               break;
-            case '':
+            // Header Lookahead (: vs ::)
+            case ':':
+              if (i + 1 < line.length() && line.charAt(i + 1) == ':') {
+                mylist.add(new Token("::", filename, lineNum, TokenType.FC_HEADER));
+                i++; // Skip lookahead char
+              } else {
+                mylist.add(new Token(":", filename, lineNum, TokenType.COLON));
+              }
               break;
-            
+            case '=':
+              if (i + 1 < line.length() && line.charAt(i + 1) == '=') {
+                mylist.add(new Token("==", filename, lineNum, TokenType.REL_OP));
+                i++;
+              } else {
+                mylist.add(new Token("=", filename, lineNum, TokenType.ASSIGN));
+              }
+              break;
+              case '<':
+                if (i + 1 < line.length()) {
+                  char nextChar = line.charAt(i + 1);
+                if (nextChar == '=') {
+                  mylist.add(new Token("<=", filename, lineNum, TokenType.REL_OP));
+                  i++;
+                } else if (nextChar == '>') {
+                  mylist.add(new Token("<>", filename, lineNum, TokenType.REL_OP));
+                  i++;
+                } else {
+                  mylist.add(new Token("<", filename, lineNum, TokenType.REL_OP));
+                }
+                } else {
+                  mylist.add(new Token("<", filename, lineNum, TokenType.REL_OP));
+                }
+                break;
+
+              case '>':
+                if (i + 1 < line.length() && line.charAt(i + 1) == '=') {
+                  mylist.add(new Token(">=", filename, lineNum, TokenType.REL_OP));
+                  i++;
+                } else {
+                  mylist.add(new Token(">", filename, lineNum, TokenType.REL_OP));
+                }
+                break;
+
+              case '!':
+                if (i + 1 < line.length() && line.charAt(i + 1) == '=') {
+                  mylist.add(new Token("!=", filename, lineNum, TokenType.REL_OP));
+                  i++;
+                } else {
+                  System.err.println("Syntax Error:");
+                  System.err.println("Invalid token \"!\". \"!\" expects following \"=\"");
+                  System.err.println(filename + ":" + lineNum);
+                  return null;
+                }
+                break;
+
+              // String literals scanning logic
+              case '"':
+                // TODO: implement string literal scanning (stubbed intentionally)
+                break;
+
+              default:
+                // Multi-character sequences (identifiers, keywords, numbers, etc.)
+                // Scanning logic is intentionally left as a stub.
+                break;
+            }
           }
         }
-        
-
-      }
-    } catch(FileNotFoundException e){
-      System.err.print(e);
-      return null;
+      } catch (FileNotFoundException e) {
+        System.err.print(e);
+        return null;
     }
     
-  
-		return null;
+    return mylist; // Returns your parsed collection safely!
 	}
 }
