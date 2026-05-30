@@ -14,11 +14,10 @@ import java.io.FileNotFoundException;
 public class JottTokenizer {
 
     /**
-    /**
      * Takes in a filename and tokenizes that file into Tokens
      * based on the rules of the Jott Language
      * @param filename the name of the file to tokenize; can be relative or absolute path
-     * @return an ArrayList of Jott Tokens
+     * @return an ArrayList of Jott Tokens, or null on syntax error
      */
     public static ArrayList<Token> tokenize(String filename) {
         ArrayList<Token> mylist = new ArrayList<Token>();
@@ -28,7 +27,7 @@ public class JottTokenizer {
         try (Scanner reader = new Scanner(file);) {
             while (reader.hasNextLine()) {
                 lineNum++;
-                String line = reader.nextLine().strip(); 
+                String line = reader.nextLine(); // Raw string preservation for indexing safety
 
                 for (int i = 0; i < line.length(); i++) {
                     char currentChar = line.charAt(i);
@@ -127,95 +126,106 @@ public class JottTokenizer {
                             }
                             break;
 
-            // String literals scanning logic
-            case '"':
-              i = stringCase(line, i, filename, lineNum, mylist);
-              break;
+                        // String literals scanning logic
+                        case '"':
+                            i = stringCase(line, i, filename, lineNum, mylist);
+                            if (i == -1) {
+                                return null; // Gracefully stop execution on inner syntax faults
+                            }
+                            break;
 
-            default:
-              //parsing id/keywords
-              if (Character.isAlphabetic(currentChar)){
-                String keywordID = "";
+                        default:
+                            // Parsing id/keywords
+                            if (Character.isAlphabetic(currentChar)){
+                                String keywordID = "";
 
-                while (i < line.length() && Character.isDigit(line.charAt(i)) || Character.isAlphabetic(line.charAt(i))) {
-                  keywordID += line.charAt(i);
-                  i++;
+                                // FIXED: Added parentheses to bind the bounds-check to the entire loop logic
+                                while (i < line.length() && (Character.isDigit(line.charAt(i)) || Character.isAlphabetic(line.charAt(i)))) {
+                                    keywordID += line.charAt(i);
+                                    i++;
+                                }
+
+                                mylist.add(new Token(keywordID, filename, lineNum, TokenType.ID_KEYWORD));
+                                i--;
+                            } 
+                            // FIXED: Added check for direct dot numbers (.5) matching the language DFA
+                            else if (Character.isDigit(currentChar) || currentChar == '.') {
+                                // Parsing numbers
+                                String num = "";
+
+                                if (currentChar == '.' && (i + 1 >= line.length() || !Character.isDigit(line.charAt(i + 1)))) {
+                                    System.err.println("Syntax Error:");
+                                    System.err.println("Invalid token \".\"");
+                                    System.err.println(filename + ":" + lineNum);
+                                    return null;
+                                }
+
+                                while (i < line.length() && Character.isDigit(line.charAt(i))) {
+                                    num += line.charAt(i);
+                                    i++;
+                                }
+
+                                if (i < line.length() && line.charAt(i) == '.') {
+                                    num += line.charAt(i);
+                                    i++;
+
+                                    if (i >= line.length() || !Character.isDigit(line.charAt(i))) {
+                                        System.err.println("Syntax Error:");
+                                        System.err.println("Invalid number \"" + num + "\"");
+                                        System.err.println(filename + ":" + lineNum);
+                                        return null;
+                                    }
+
+                                    while (i < line.length() && Character.isDigit(line.charAt(i))) {
+                                        num += line.charAt(i);
+                                        i++;
+                                    }
+                                }
+
+                                i--;
+                                mylist.add(new Token(num, filename, lineNum, TokenType.NUMBER));
+                            } else {
+                                System.err.println("Syntax Error:");
+                                System.err.println("Invalid token \"" + currentChar + "\".");
+                                System.err.println(filename + ":" + lineNum);
+                                return null;
+                            }
+                            break;
+                    }
                 }
-
-
-                mylist.add(new Token(keywordID, filename, lineNum, TokenType.ID_KEYWORD));
-
-                i--;
-              } else if (Character.isDigit(currentChar)) {
-                //parsing numbers
-                String num = "";
-
-                while (i < line.length() && Character.isDigit(line.charAt(i))) {
-                  num += line.charAt(i);
-                  i++;
-                }
-
-                if (i < line.length() && line.charAt(i) == '.') {
-                  num += line.charAt(i);
-                  i++;
-
-                  if (i >= line.length() || !Character.isDigit(line.charAt(i))) {
-                    System.err.println("Syntax Error:");
-                    System.err.println("Invalid number \"" + num + "\"");
-                    System.err.println(filename + ":" + lineNum);
-                    return null;
-                  }
-
-                  while (i < line.length() && Character.isDigit(line.charAt(i))) {
-                    num += line.charAt(i);
-                    i++;
-                  }
-                }
-
-                i--;
-                mylist.add(new Token(num, filename, lineNum, TokenType.NUMBER));
-              } else{
-                System.err.println("Syntax Error:");
-                System.err.println("Invalid token \"" + currentChar + "\".");
-                System.err.println(filename + ":" + lineNum);
-                return null;
-              }
-              break;
-          }
+            }
+        } catch (FileNotFoundException e) {
+            System.err.print(e);
+            return null;
         }
-      }
-    } catch (FileNotFoundException e) {
-      System.err.print(e);
-      return null;
+
+        return mylist;
     }
 
-    return mylist; // Returns your parsed collection safely!
-  }
-
-  private static int stringCase(String line, int i, String filename, int lineNum, ArrayList<Token> tokens){
-    String str = "\"";
-    i++;
-    while (i < line.length() && line.charAt(i) != '"'){
-      char currentChar = line.charAt(i);
-      if(!Character.isLetterOrDigit(currentChar) && currentChar != ' '){
-        System.err.println("syntax error:");
-        System.err.println("invalid character in string: \"" + currentChar + "\"");
-        System.err.println(filename + ":" + lineNum);
-        return -1;
-      }
-      else{
-        str += currentChar;
+    private static int stringCase(String line, int i, String filename, int lineNum, ArrayList<Token> tokens){
+        String str = "\"";
         i++;
-      }
+        while (i < line.length() && line.charAt(i) != '"'){
+            char currentChar = line.charAt(i);
+            if(!Character.isLetterOrDigit(currentChar) && currentChar != ' '){
+                System.err.println("Syntax Error:"); // Capitalized for strict compliance
+                System.err.println("invalid character in string: \"" + currentChar + "\"");
+                System.err.println(filename + ":" + lineNum);
+                return -1;
+            }
+            else{
+                str += currentChar;
+                i++;
+            }
+        }
+        if(i >= line.length()){
+            System.err.println("Syntax Error:"); // Capitalized for strict compliance
+            System.err.println("quote never ended");
+            System.err.println(filename + ":" + lineNum);
+            return -1;
+        }
+        str += "\"";
+        tokens.add(new Token(str, filename, lineNum, TokenType.STRING));
+        return i;
     }
-    if(i >= line.length()){
-      System.err.println("syntax error:");
-      System.err.println("quote never ended");
-      System.err.println(filename + ":" + lineNum);
-      return -1;
-    }
-    str += "\"";
-    tokens.add(new Token(str, filename, lineNum, TokenType.STRING));
-    return i;
-  }
 }
