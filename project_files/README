@@ -7,8 +7,6 @@ the testCases directories should be in the working directory of your project.
 
 Setup guide
 
-I’m checking the current compile status and needed file changes so I can give you an exact fix list.
-
 Ran terminal command:  mkdir -p bin && javac -d bin project_files/provided/*.java project_files/testers/*.java
 
 Ran terminal command:  cd /workspaces/jot_translator/project_files && java -cp ../bin testers.JottTokenizerTester
