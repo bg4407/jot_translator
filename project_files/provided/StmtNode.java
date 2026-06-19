@@ -28,9 +28,9 @@ public class StmtNode {
             return "Return " + expr.convertToJott() + ";";
         }
 
-        @Override public String convertToJava(String className) { return ""; }
-        @Override public String convertToC() { return ""; }
-        @Override public String convertToPython() { return ""; }
+        @Override public String convertToJava(String className) { throw new UnsupportedOperationException("Not implemented: convertToJava"); }
+        @Override public String convertToC() { throw new UnsupportedOperationException("Not implemented: convertToC"); }
+        @Override public String convertToPython() { throw new UnsupportedOperationException("Not implemented: convertToPython"); }
         @Override public boolean validateTree() { return true; }
     }
 
@@ -53,9 +53,9 @@ public class StmtNode {
             return id.getToken() + "=" + expr.convertToJott() + ";";
         }
 
-        @Override public String convertToJava(String className) { return ""; }
-        @Override public String convertToC() { return ""; }
-        @Override public String convertToPython() { return ""; }
+        @Override public String convertToJava(String className) { throw new UnsupportedOperationException("Not implemented: convertToJava"); }
+        @Override public String convertToC() { throw new UnsupportedOperationException("Not implemented: convertToC"); }
+        @Override public String convertToPython() { throw new UnsupportedOperationException("Not implemented: convertToPython"); }
         @Override public boolean validateTree() { return true; }
     }
 
@@ -77,9 +77,9 @@ public class StmtNode {
             return funcCall.convertToJott() + ";";
         }
 
-        @Override public String convertToJava(String className) { return ""; }
-        @Override public String convertToC() { return ""; }
-        @Override public String convertToPython() { return ""; }
+        @Override public String convertToJava(String className) { throw new UnsupportedOperationException("Not implemented: convertToJava"); }
+        @Override public String convertToC() { throw new UnsupportedOperationException("Not implemented: convertToC"); }
+        @Override public String convertToPython() { throw new UnsupportedOperationException("Not implemented: convertToPython"); }
         @Override public boolean validateTree() { return true; }
     }
 }
