@@ -39,8 +39,8 @@ java -cp bin testers.JottParserTester
 
 ## Test Results
 
-**Tokenizer Tests**: 12/12 ✅  
-**Parser Tests**: 30/30 ✅
+**Tokenizer Tests**: 12/12 
+**Parser Tests**: 30/30 
 
 ## Architecture Notes
 
