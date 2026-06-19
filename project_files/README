@@ -25,3 +25,12 @@ Because the test runners depend on relative directory paths to locate test cases
 cd project_files
 java -cp ../bin testers.JottTokenizerTester
 ```
+
+## PHASE 2 
+
+Once you setup and have compiled the files above; you should be able to run the following cmds from the repo root and vlidate the tests 
+
+```bash
+cd project_files
+java -cp ../bin testers.JottParserTester
+```
