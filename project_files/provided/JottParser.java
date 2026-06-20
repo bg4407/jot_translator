@@ -4,7 +4,7 @@ package provided;
  * This class is responsible for paring Jott Tokens
  * into a Jott parse tree.
  *
- * @author Conner Meagher, Anindita Bhowmik, Borniel Gope, Jatin Jain
+ * @author Conner Meagher, Anindita Bhowmik, Borneil Gope, Jatin Jain
  */
 
 import java.util.ArrayList;

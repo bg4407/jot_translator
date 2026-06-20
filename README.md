@@ -1,7 +1,7 @@
 # Jott Translator - Phase 1 (Tokenizer) & Phase 2 (Parser)
 
 ## Group Members (GROUP 1)
-Authors: Conner Meagher, Anindita Bhowmik, Borniel Gope, Jatin Jain
+Authors: Conner Meagher, Anindita Bhowmik, Borneil Gope, Jatin Jain
 
 
 ## Project Structure

@@ -3,7 +3,7 @@
  * These nodes represent conditional and looping structures in Jott programs,
  * including if/else if/else statements and while loops.
  *
- * @author Conner Meagher, Anindita Bhowmik, Borniel Gope, Jatin Jain
+ * @author Conner Meagher, Anindita Bhowmik, Borneil Gope, Jatin Jain
  */
 package provided;
 

@@ -3,7 +3,7 @@
  * These nodes represent expressions (with operators), operands (values and identifiers),
  * function calls, and literal values (strings and booleans) in Jott programs.
  *
- * @author Conner Meagher, Anindita Bhowmik, Borniel Gope, Jatin Jain
+ * @author Conner Meagher, Anindita Bhowmik, Borneil Gope, Jatin Jain
  */
 package provided;
 

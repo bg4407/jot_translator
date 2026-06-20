@@ -3,7 +3,7 @@
  * These nodes represent individual statements that can appear in a Jott program,
  * including return statements, assignments, and function call statements.
  *
- * @author Conner Meagher, Anindita Bhowmik, Borniel Gope, Jatin Jain
+ * @author Conner Meagher, Anindita Bhowmik, Borneil Gope, Jatin Jain
  */
 package provided;
 

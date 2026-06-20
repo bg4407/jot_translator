@@ -3,7 +3,7 @@
  * These nodes represent the top-level constructs of a Jott program including
  * the program itself, function definitions, parameters, and variable declarations.
  *
- * @author Conner Meagher, Anindita Bhowmik, Borniel Gope, Jatin Jain
+ * @author Conner Meagher, Anindita Bhowmik, Borneil Gope, Jatin Jain
  */
 package provided;
 
