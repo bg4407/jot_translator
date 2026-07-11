@@ -23,6 +23,23 @@ mkdir -p bin
 javac -d bin provided/*.java testers/*.java
 ```
 
+### Build and run all tests
+
+```bash
+cd /workspaces/jot_translator/project_files
+mkdir -p bin
+javac -d bin provided/*.java testers/*.java
+java -cp bin testers.JottTokenizerTester
+java -cp bin testers.JottParserTester
+java -cp bin testers.Phase3Tester
+```
+
+You can also run everything in one line:
+
+```bash
+cd /workspaces/jot_translator/project_files && mkdir -p bin && javac -d bin provided/*.java testers/*.java && java -cp bin testers.JottTokenizerTester && java -cp bin testers.JottParserTester && java -cp bin testers.Phase3Tester
+```
+
 ### Running the Tokenizer Tester (Phase 1)
 
 ```bash
@@ -35,6 +52,20 @@ java -cp bin testers.JottTokenizerTester
 ```bash
 cd project_files
 java -cp bin testers.JottParserTester
+```
+
+### Running the Semantic Tester (Phase 3)
+
+```bash
+cd project_files
+java -cp bin testers.Phase3Tester
+```
+
+### Running the Jott compiler driver
+
+```bash
+cd project_files
+java -cp bin provided.Jott <input.jott> <output_file> <Jott|Java|C|Python>
 ```
 
 ## Test Results
