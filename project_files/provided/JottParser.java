@@ -40,6 +40,14 @@ public class JottParser {
             return null;
         }
 
+        // NOTE: Semantic analysis intentionally does NOT happen here.
+        // JottParserTester expects parse() to succeed (return a non-null tree)
+        // for programs that are syntactically valid but semantically invalid
+        // (e.g. mismatched return types, undefined functions, missing main).
+        // Semantic validation is a separate step - call
+        // `new SemanticAnalyzer().validateProgram(root)` after parsing
+        // succeeds, wherever Phase 3 is actually being tested/run (e.g. in
+        // Jott.java's main driver).
         return root;
     }
 
@@ -112,6 +120,17 @@ public class JottParser {
                 && tokens.get(pos + 1).getTokenType() == TokenType.ID_KEYWORD;
     }
 
+    /**
+     * True if the token immediately after the current position is a left
+     * bracket '['. Used to disambiguate "If"/"While" used as the control-flow
+     * keyword (always followed by '[') from "If"/"While" used as an ordinary
+     * identifier (e.g. a variable literally named "While").
+     */
+    private static boolean nextIsLBracket() {
+        return pos + 1 < tokens.size()
+                && tokens.get(pos + 1).getTokenType() == TokenType.L_BRACKET;
+    }
+
     private static String tokenKindName(Token t) {
         if (t == null) return "EOF";
 
@@ -132,7 +151,7 @@ public class JottParser {
         List<FunctionDefNode> funcs = new ArrayList<>();
 
         while (peek() != null && !errorFound) {
-            if (!peek().getToken().equals("Def")) {
+            if (!peek().getToken().equalsIgnoreCase("Def")) {
                 syntaxError("Expected 'Def' to start a function definition but got '" +
                         peek().getToken() + "'", peek());
                 return null;
@@ -149,7 +168,7 @@ public class JottParser {
 
     // function_def -> Def id [ func_def_params ] : function_return { f_body }
     private static FunctionDefNode parseFunctionDef() {
-        consume(); // Def
+        consume(); // Def / def
 
         Token nameTok = peek();
 
@@ -247,7 +266,7 @@ public class JottParser {
     private static String parseFunctionReturn() {
         Token t = peek();
 
-        if (t != null && t.getToken().equals("Void")) {
+        if (t != null && t.getToken().equalsIgnoreCase("Void")) {
             consume();
             return "Void";
         }
@@ -311,8 +330,13 @@ public class JottParser {
         if (t == null) return false;
 
         if (t.getTokenType() == TokenType.FC_HEADER) return true;
-        if (t.getToken().equals("If")) return true;
-        if (t.getToken().equals("While")) return true;
+
+        // "If"/"While" only count as the control-flow keyword when they are
+        // immediately followed by '[' (the only valid syntax for either
+        // construct). Otherwise they fall through to being treated as an
+        // ordinary identifier, e.g. a variable literally named "While".
+        if (t.getToken().equals("If") && nextIsLBracket()) return true;
+        if (t.getToken().equals("While") && nextIsLBracket()) return true;
 
         if (t.getTokenType() == TokenType.ID_KEYWORD) {
             String v = t.getToken();
@@ -330,11 +354,11 @@ public class JottParser {
     private static JottTree parseBodyStmt() {
         Token t = peek();
 
-        if (t.getToken().equals("If")) {
+        if (t.getToken().equals("If") && nextIsLBracket()) {
             return parseIfStmt();
         }
 
-        if (t.getToken().equals("While")) {
+        if (t.getToken().equals("While") && nextIsLBracket()) {
             return parseWhileLoop();
         }
 
