@@ -85,7 +85,18 @@ public class ExpressionNode {
         @Override
         public String convertToC() {
             if ("print".equals(name.getToken())) {
-                return "printf(\"%s\\n\", " + params.get(0).convertToC() + ")";
+                String inner = params.get(0).convertToC();
+                String type = inferExprType(params.get(0));
+                if ("String".equals(type)) {
+                    return "printf(\"%s\\n\", " + inner + ")";
+                }
+                if ("Boolean".equals(type)) {
+                    return "printf(\"%s\\n\", " + inner + " ? \"True\" : \"False\")";
+                }
+                if ("Double".equals(type)) {
+                    return "printf(\"%f\\n\", " + inner + ")";
+                }
+                return "printf(\"%d\\n\", " + inner + ")";
             }
             if ("concat".equals(name.getToken())) {
                 return "jott_concat(" + params.get(0).convertToC() + ", " + params.get(1).convertToC() + ")";

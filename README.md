@@ -1,4 +1,4 @@
-# Jott Translator - Phase 1 (Tokenizer) & Phase 2 (Parser)
+# Jott Translator (Phases 1-4)
 
 ## Group Members (GROUP 1)
 Authors: Conner Meagher, Anindita Bhowmik, Borneil Gope, Jatin Jain
@@ -18,7 +18,7 @@ Authors: Conner Meagher, Anindita Bhowmik, Borneil Gope, Jatin Jain
 ### Build and run all tests
 
 ```bash
-cd /jot_translator/project_files
+cd /workspaces/jot_translator/project_files
 mkdir -p bin
 javac -d bin provided/*.java testers/*.java
 java -cp bin testers.JottTokenizerTester
@@ -53,11 +53,16 @@ cd project_files
 java -cp bin testers.Phase3Tester
 ```
 
-### Phase 4 Full project Compilation 
+### Phase 4 Translation Driver
 ```bash
 cd /workspaces/jot_translator/project_files
 java -cp bin provided.Jott <input.jott> <output_file> <Jott|Java|C|Python>
 ```
+
+Important:
+- Input must be a Jott source file (`.jott`).
+- This project translates in one direction only: `Jott -> {Jott, Java, C, Python}`.
+- Reverse parsing of Java/C/Python back into Jott is not part of this project.
 
 ## Test Results
 
@@ -66,11 +71,11 @@ java -cp bin provided.Jott <input.jott> <output_file> <Jott|Java|C|Python>
 **Phase 3 Tests**: 19/19
 
 
-### Running Structured Round-Trip Tests
+### Running Structured Translation Fixture Tests
 
-The repository now includes a subtest-oriented translation harness under `project_files/tests/roundtrip/`.
+The repository includes a subtest-oriented translation harness under `project_files/tests/roundtrip/`.
 
-Each subtest directory should contain a source Jott file (for example `file1.jott`).
+Each subtest directory contains a source Jott file (for example `file1.jott`).
 The runner generates sibling outputs such as `file1.java`, `file1.c`, `file1.py`, and `file1-canonical.jott`.
 
 From the `project_files` directory:
@@ -78,15 +83,6 @@ From the `project_files` directory:
 ```bash
 bash tests/roundtrip/run_roundtrip.sh
 ```
-
-Current limitation:
-- The translator supports `Jott -> {Jott, Java, C, Python}`.
-- Java/C/Python back into Jott is not built into this project.
-
-Optional Java -> Jott reverse check:
-- If you have an external reverse converter, set `JOTT_REVERSE_JAVA_TOOL` before running.
-- The tool interface must be: `reverse_converter <input.java> <output.jott>`.
-- When configured, the harness writes `fileN-new.jott` and compares it against canonical Jott output.
 
 ### Running Phase 4 Spec Regression Tests
 

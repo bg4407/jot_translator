@@ -4,7 +4,7 @@ def main():
     x = None
     x = 0
     while x < 10:
-    x = foo(x)
-    print(x)
+        x = foo(x)
+        print(x)
 
 main()
