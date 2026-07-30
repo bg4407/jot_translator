@@ -77,14 +77,19 @@ public class ControlFlowNode {
 
         @Override
         public String convertToPython() {
+            return convertToPython(0);
+        }
+
+        public String convertToPython(int indentLevel) {
             StringBuilder sb = new StringBuilder();
-            sb.append("if ").append(cond.convertToPython()).append(":\n");
-            sb.append(body.convertToPython(1));
+            sb.append(indent(indentLevel)).append("if ").append(cond.convertToPython()).append(":\n");
+            sb.append(body.convertToPython(indentLevel + 1));
             for (ElseIfNode ei : elseIfs) {
-                sb.append("\nelif ").append(ei.convertToPython());
+                sb.append("\n").append(ei.convertToPython(indentLevel));
             }
             if (elseNode != null) {
-                sb.append("\nelse:\n").append(elseNode.convertToPython(1));
+                sb.append("\n").append(indent(indentLevel)).append("else:\n");
+                sb.append(elseNode.convertToPython(indentLevel + 1));
             }
             return sb.toString();
         }
@@ -126,7 +131,11 @@ public class ControlFlowNode {
 
         @Override
         public String convertToPython() {
-            return cond.convertToPython() + ":\n" + body.convertToPython(1);
+            return convertToPython(0);
+        }
+
+        public String convertToPython(int indentLevel) {
+            return indent(indentLevel) + "elif " + cond.convertToPython() + ":\n" + body.convertToPython(indentLevel + 1);
         }
 
         @Override public boolean validateTree() { return true; }
@@ -204,9 +213,21 @@ public class ControlFlowNode {
 
         @Override
         public String convertToPython() {
-            return "while " + cond.convertToPython() + ":\n" + body.convertToPython(1);
+            return convertToPython(0);
+        }
+
+        public String convertToPython(int indentLevel) {
+            return indent(indentLevel) + "while " + cond.convertToPython() + ":\n" + body.convertToPython(indentLevel + 1);
         }
 
         @Override public boolean validateTree() { return true; }
+    }
+
+    private static String indent(int level) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < level; i++) {
+            sb.append("    ");
+        }
+        return sb.toString();
     }
 }

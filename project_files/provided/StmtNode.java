@@ -7,7 +7,29 @@
  */
 package provided;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class StmtNode {
+
+    private static Map<String, String> currentVariableTypes = new HashMap<>();
+    private static Map<String, String> currentFunctionReturnTypes = new HashMap<>();
+
+    public static void setCurrentVariableTypes(Map<String, String> variableTypes) {
+        currentVariableTypes = new HashMap<>(variableTypes);
+    }
+
+    public static void clearCurrentVariableTypes() {
+        currentVariableTypes = new HashMap<>();
+    }
+
+    public static void setCurrentFunctionReturnTypes(Map<String, String> functionReturnTypes) {
+        currentFunctionReturnTypes = new HashMap<>(functionReturnTypes);
+    }
+
+    public static void clearCurrentFunctionReturnTypes() {
+        currentFunctionReturnTypes = new HashMap<>();
+    }
 
     /**
      * Represents a return statement in Jott.
@@ -152,13 +174,63 @@ public class StmtNode {
                     return op.numTok.getToken().contains(".") ? "Double" : "Integer";
                 }
                 if (op.idTok != null) {
-                    return "Unknown";
+                    String idType = currentVariableTypes.get(op.idTok.getToken());
+                    return idType == null ? "Unknown" : idType;
+                }
+                if (op.funcCall != null) {
+                    String name = op.funcCall.name.getToken();
+                    if ("length".equals(name)) return "Integer";
+                    if ("concat".equals(name)) return "String";
+                    String fnType = currentFunctionReturnTypes.get(name);
+                    return fnType == null ? "Unknown" : fnType;
                 }
             }
             if (expr.op != null) {
-                return expr.op.getTokenType() == TokenType.REL_OP ? "Boolean" : "Integer";
+                if (expr.op.getTokenType() == TokenType.REL_OP) {
+                    return "Boolean";
+                }
+                String leftType = inferLeftType(expr.left);
+                String rightType = inferOperandType(expr.right);
+                if ("Double".equals(leftType) || "Double".equals(rightType)) {
+                    return "Double";
+                }
+                if ("String".equals(leftType) || "String".equals(rightType)) {
+                    return "String";
+                }
+                return "Integer";
             }
             return "Integer";
+        }
+
+        private String inferLeftType(JottTree left) {
+            if (left instanceof ExpressionNode.ExprNode) {
+                return inferType((ExpressionNode.ExprNode) left);
+            }
+            if (left instanceof ExpressionNode.StringLiteralNode) return "String";
+            if (left instanceof ExpressionNode.BoolNode) return "Boolean";
+            if (left instanceof ExpressionNode.OperandNode) {
+                return inferOperandType((ExpressionNode.OperandNode) left);
+            }
+            return "Unknown";
+        }
+
+        private String inferOperandType(ExpressionNode.OperandNode op) {
+            if (op == null) return "Unknown";
+            if (op.numTok != null) {
+                return op.numTok.getToken().contains(".") ? "Double" : "Integer";
+            }
+            if (op.idTok != null) {
+                String idType = currentVariableTypes.get(op.idTok.getToken());
+                return idType == null ? "Unknown" : idType;
+            }
+            if (op.funcCall != null) {
+                String name = op.funcCall.name.getToken();
+                if ("length".equals(name)) return "Integer";
+                if ("concat".equals(name)) return "String";
+                String fnType = currentFunctionReturnTypes.get(name);
+                return fnType == null ? "Unknown" : fnType;
+            }
+            return "Unknown";
         }
     }
 }

@@ -1,0 +1,5 @@
+# spec check: generated C main should return 1
+
+Def main[]:Void{
+    ::print["ok"];
+}

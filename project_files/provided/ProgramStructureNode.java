@@ -7,7 +7,9 @@
  */
 package provided;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ProgramStructureNode {
 
@@ -50,15 +52,48 @@ public class ProgramStructureNode {
             sb.append("#include <string.h>\n");
             sb.append("#include <stdlib.h>\n");
             sb.append("#include <stdbool.h>\n\n");
+
+            sb.append("char* jott_concat(const char* a, const char* b) {\n");
+            sb.append("    size_t lenA = strlen(a);\n");
+            sb.append("    size_t lenB = strlen(b);\n");
+            sb.append("    char* out = (char*)malloc(lenA + lenB + 1);\n");
+            sb.append("    if (out == NULL) {\n");
+            sb.append("        return NULL;\n");
+            sb.append("    }\n");
+            sb.append("    memcpy(out, a, lenA);\n");
+            sb.append("    memcpy(out + lenA, b, lenB);\n");
+            sb.append("    out[lenA + lenB] = '\\0';\n");
+            sb.append("    return out;\n");
+            sb.append("}\n\n");
+
+            Map<String, String> functionReturnTypes = new HashMap<>();
+            functionReturnTypes.put("print", "Void");
+            functionReturnTypes.put("concat", "String");
+            functionReturnTypes.put("length", "Integer");
+            for (FunctionDefNode f : funcs) {
+                functionReturnTypes.put(f.name.getToken(), f.returnType);
+            }
+            StmtNode.setCurrentFunctionReturnTypes(functionReturnTypes);
+
             for (FunctionDefNode f : funcs) {
                 sb.append(f.convertToC()).append("\n");
             }
+            StmtNode.clearCurrentFunctionReturnTypes();
             return sb.toString();
         }
 
         @Override
         public String convertToPython() {
             StringBuilder sb = new StringBuilder();
+            Map<String, String> functionReturnTypes = new HashMap<>();
+            functionReturnTypes.put("print", "Void");
+            functionReturnTypes.put("concat", "String");
+            functionReturnTypes.put("length", "Integer");
+            for (FunctionDefNode f : funcs) {
+                functionReturnTypes.put(f.name.getToken(), f.returnType);
+            }
+            ExpressionNode.setCurrentFunctionReturnTypes(functionReturnTypes);
+
             for (int i = 0; i < funcs.size(); i++) {
                 if (i > 0) {
                     sb.append("\n");
@@ -68,6 +103,7 @@ public class ProgramStructureNode {
             if (hasMainFunction()) {
                 sb.append("\n\nmain()\n");
             }
+            ExpressionNode.clearCurrentFunctionReturnTypes();
             return sb.toString();
         }
 
@@ -136,6 +172,9 @@ public class ProgramStructureNode {
         @Override
         public String convertToC() {
             StringBuilder sb = new StringBuilder();
+            java.util.Map<String, String> variableTypes = buildVariableTypeMap();
+            StmtNode.setCurrentVariableTypes(variableTypes);
+            ExpressionNode.setCurrentVariableTypes(variableTypes);
             if ("main".equals(name.getToken())) {
                 sb.append("int main(void) {");
             } else {
@@ -148,15 +187,19 @@ public class ProgramStructureNode {
             }
             sb.append("\n").append(fBody.convertToC()).append("\n");
             if ("main".equals(name.getToken())) {
-                sb.append("    return 0;\n");
+                sb.append("    return 1;\n");
             }
             sb.append("}");
+            StmtNode.clearCurrentVariableTypes();
+            ExpressionNode.clearCurrentVariableTypes();
             return sb.toString();
         }
 
         @Override
         public String convertToPython() {
             StringBuilder sb = new StringBuilder();
+            java.util.Map<String, String> variableTypes = buildVariableTypeMap();
+            ExpressionNode.setCurrentVariableTypes(variableTypes);
             sb.append("def ").append(name.getToken()).append("(");
             for (int i = 0; i < params.size(); i++) {
                 if (i > 0) sb.append(", ");
@@ -164,10 +207,22 @@ public class ProgramStructureNode {
             }
             sb.append("):");
             sb.append("\n").append(fBody.convertToPython(1));
+            ExpressionNode.clearCurrentVariableTypes();
             return sb.toString();
         }
 
         @Override public boolean validateTree() { return true; }
+
+        private java.util.Map<String, String> buildVariableTypeMap() {
+            java.util.Map<String, String> variableTypes = new java.util.HashMap<>();
+            for (ParamDefNode p : params) {
+                variableTypes.put(p.name.getToken(), p.type);
+            }
+            for (VarDecNode v : fBody.varDecs) {
+                variableTypes.put(v.name.getToken(), v.type);
+            }
+            return variableTypes;
+        }
     }
 
     /**
@@ -356,7 +411,13 @@ public class ProgramStructureNode {
         public String convertToPython(int indentLevel) {
             StringBuilder sb = new StringBuilder();
             for (JottTree stmt : stmts) {
-                sb.append(indent(indentLevel)).append(stmt.convertToPython()).append("\n");
+                if (stmt instanceof ControlFlowNode.IfStmtNode) {
+                    sb.append(((ControlFlowNode.IfStmtNode) stmt).convertToPython(indentLevel)).append("\n");
+                } else if (stmt instanceof ControlFlowNode.WhileNode) {
+                    sb.append(((ControlFlowNode.WhileNode) stmt).convertToPython(indentLevel)).append("\n");
+                } else {
+                    sb.append(indent(indentLevel)).append(stmt.convertToPython()).append("\n");
+                }
             }
             if (returnStmt != null) {
                 sb.append(indent(indentLevel)).append(returnStmt.convertToPython()).append("\n");

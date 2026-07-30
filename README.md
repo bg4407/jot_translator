@@ -94,6 +94,21 @@ Optional Java -> Jott reverse check:
 - If you have an external reverse converter, set `JOTT_REVERSE_JAVA_TOOL` before running.
 - The tool interface must be: `reverse_converter <input.java> <output.jott>`.
 - When configured, the harness writes `fileN-new.jott` and compares it against canonical Jott output.
+
+### Running Phase 4 Spec Regression Tests
+
+This suite checks key Phase 4 requirements in generated output behavior:
+- Python integer division truncation (`5/2 -> 2` for Integer operands)
+- C String parameter printing
+- C Boolean variable printing (`True`/`False`)
+- Nested Python `If`/`While` indentation correctness
+- Generated C `main` containing `return 1;`
+
+From `project_files`:
+
+```bash
+bash tests/phase4/run_phase4_spec_tests.sh
+```
 ## Architecture Notes
 
 The parser uses a recursive descent approach with separate node files for better organization:

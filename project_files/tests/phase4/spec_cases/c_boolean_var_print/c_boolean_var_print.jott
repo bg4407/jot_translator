@@ -1,0 +1,9 @@
+# spec check: printing Boolean variables in C should emit True/False
+
+Def main[]:Void{
+    Boolean b;
+    b = True;
+    ::print[b];
+    b = False;
+    ::print[b];
+}
