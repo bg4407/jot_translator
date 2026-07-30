@@ -7,9 +7,30 @@
  */
 package provided;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ExpressionNode {
+
+    private static Map<String, String> currentVariableTypes = new HashMap<>();
+    private static Map<String, String> currentFunctionReturnTypes = new HashMap<>();
+
+    public static void setCurrentVariableTypes(Map<String, String> variableTypes) {
+        currentVariableTypes = new HashMap<>(variableTypes);
+    }
+
+    public static void clearCurrentVariableTypes() {
+        currentVariableTypes = new HashMap<>();
+    }
+
+    public static void setCurrentFunctionReturnTypes(Map<String, String> functionReturnTypes) {
+        currentFunctionReturnTypes = new HashMap<>(functionReturnTypes);
+    }
+
+    public static void clearCurrentFunctionReturnTypes() {
+        currentFunctionReturnTypes = new HashMap<>();
+    }
 
     /**
      * Represents a function call expression.
@@ -67,10 +88,10 @@ public class ExpressionNode {
                 return "printf(\"%s\\n\", " + params.get(0).convertToC() + ")";
             }
             if ("concat".equals(name.getToken())) {
-                return "strcat(" + params.get(0).convertToC() + ", " + params.get(1).convertToC() + ")";
+                return "jott_concat(" + params.get(0).convertToC() + ", " + params.get(1).convertToC() + ")";
             }
             if ("length".equals(name.getToken())) {
-                return "strlen(" + params.get(0).convertToC() + ")";
+                return "((int)strlen(" + params.get(0).convertToC() + "))";
             }
             StringBuilder sb = new StringBuilder();
             sb.append(name.getToken()).append("(");
@@ -152,7 +173,15 @@ public class ExpressionNode {
             if (op == null) {
                 return left.convertToPython();
             }
-            return left.convertToPython() + " " + op.getToken() + " " + right.convertToPython();
+            String pythonOp = op.getToken();
+            if ("/".equals(pythonOp)) {
+                String leftType = inferTreeType(left);
+                String rightType = inferOperandType(right);
+                if ("Integer".equals(leftType) && "Integer".equals(rightType)) {
+                    pythonOp = "//";
+                }
+            }
+            return left.convertToPython() + " " + pythonOp + " " + right.convertToPython();
         }
 
         @Override public boolean validateTree() { return true; }
@@ -308,5 +337,63 @@ public class ExpressionNode {
         }
 
         @Override public boolean validateTree() { return true; }
+    }
+
+    private static String inferExprType(ExprNode expr) {
+        if (expr == null) return "Unknown";
+        if (expr.op == null) {
+            return inferTreeType(expr.left);
+        }
+
+        if (expr.op.getTokenType() == TokenType.REL_OP) {
+            return "Boolean";
+        }
+
+        String leftType = inferTreeType(expr.left);
+        String rightType = inferOperandType(expr.right);
+
+        if ("String".equals(leftType) || "String".equals(rightType)) {
+            return "String";
+        }
+        if ("Double".equals(leftType) || "Double".equals(rightType)) {
+            return "Double";
+        }
+        if ("Integer".equals(leftType) && "Integer".equals(rightType)) {
+            return "Integer";
+        }
+        return "Unknown";
+    }
+
+    private static String inferTreeType(JottTree tree) {
+        if (tree == null) return "Unknown";
+        if (tree instanceof ExprNode) {
+            return inferExprType((ExprNode) tree);
+        }
+        if (tree instanceof StringLiteralNode) return "String";
+        if (tree instanceof BoolNode) return "Boolean";
+        if (tree instanceof OperandNode) {
+            return inferOperandType((OperandNode) tree);
+        }
+        return "Unknown";
+    }
+
+    private static String inferOperandType(OperandNode op) {
+        if (op == null) return "Unknown";
+        if (op.numTok != null) {
+            return op.numTok.getToken().contains(".") ? "Double" : "Integer";
+        }
+        if (op.idTok != null) {
+            String idType = currentVariableTypes.get(op.idTok.getToken());
+            return idType == null ? "Unknown" : idType;
+        }
+        if (op.funcCall != null) {
+            String name = op.funcCall.name.getToken();
+            if ("concat".equals(name)) return "String";
+            if ("length".equals(name)) return "Integer";
+            if ("print".equals(name)) return "Void";
+            String fnType = currentFunctionReturnTypes.get(name);
+            return fnType == null ? "Unknown" : fnType;
+        }
+        return "Unknown";
     }
 }

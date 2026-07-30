@@ -1,0 +1,9 @@
+# spec check: printing a String parameter in C should use %s and run safely
+
+Def bar[s:String]:Void{
+    ::print[s];
+}
+
+Def main[]:Void{
+    ::bar["hello"];
+}

@@ -1,0 +1,9 @@
+# spec check: Integer division must truncate (5/2 -> 2)
+
+Def main[]:Void{
+    Integer a;
+    Integer b;
+    a = 5;
+    b = 2;
+    ::print[a/b];
+}
