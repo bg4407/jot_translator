@@ -72,6 +72,28 @@ java -cp bin provided.Jott <input.jott> <output_file> <Jott|Java|C|Python>
 **Tokenizer Tests**: 12/12 
 **Parser Tests**: 30/30 
 
+
+### Running Structured Round-Trip Tests
+
+The repository now includes a subtest-oriented translation harness under `project_files/tests/roundtrip/`.
+
+Each subtest directory should contain a source Jott file (for example `file1.jott`).
+The runner generates sibling outputs such as `file1.java`, `file1.c`, `file1.py`, and `file1-canonical.jott`.
+
+From the `project_files` directory:
+
+```bash
+bash tests/roundtrip/run_roundtrip.sh
+```
+
+Current limitation:
+- The translator supports `Jott -> {Jott, Java, C, Python}`.
+- Java/C/Python back into Jott is not built into this project.
+
+Optional Java -> Jott reverse check:
+- If you have an external reverse converter, set `JOTT_REVERSE_JAVA_TOOL` before running.
+- The tool interface must be: `reverse_converter <input.java> <output.jott>`.
+- When configured, the harness writes `fileN-new.jott` and compares it against canonical Jott output.
 ## Architecture Notes
 
 The parser uses a recursive descent approach with separate node files for better organization:

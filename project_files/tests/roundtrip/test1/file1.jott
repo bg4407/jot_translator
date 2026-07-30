@@ -1,0 +1,5 @@
+# roundtrip test 1
+
+Def main[]:Void{
+    ::print["Hello World"];
+}
