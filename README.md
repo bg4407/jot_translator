@@ -14,19 +14,11 @@ Authors: Conner Meagher, Anindita Bhowmik, Borneil Gope, Jatin Jain
 - `tokenizerTestCases/`: Test cases for tokenizer (Phase 1)
 - `phase3testcases/`: Test cases for parser (Phase 2+)
 
-## Building and running the code
-
-From the `project_files` directory:
-
-```bash
-mkdir -p bin
-javac -d bin provided/*.java testers/*.java
-```
 
 ### Build and run all tests
 
 ```bash
-cd /workspaces/jot_translator/project_files
+cd /jot_translator/project_files
 mkdir -p bin
 javac -d bin provided/*.java testers/*.java
 java -cp bin testers.JottTokenizerTester
