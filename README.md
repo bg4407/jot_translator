@@ -61,10 +61,9 @@ cd project_files
 java -cp bin testers.Phase3Tester
 ```
 
-### Running the Jott compiler driver
-
+### Phase 4 Full project Compilation 
 ```bash
-cd project_files
+cd /workspaces/jot_translator/project_files
 java -cp bin provided.Jott <input.jott> <output_file> <Jott|Java|C|Python>
 ```
 
