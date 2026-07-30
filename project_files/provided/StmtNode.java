@@ -28,9 +28,21 @@ public class StmtNode {
             return "Return " + expr.convertToJott() + ";";
         }
 
-        @Override public String convertToJava(String className) { throw new UnsupportedOperationException("Not implemented: convertToJava"); }
-        @Override public String convertToC() { throw new UnsupportedOperationException("Not implemented: convertToC"); }
-        @Override public String convertToPython() { throw new UnsupportedOperationException("Not implemented: convertToPython"); }
+        @Override
+        public String convertToJava(String className) {
+            return expr == null ? "return;" : "return " + expr.convertToJava(className) + ";";
+        }
+
+        @Override
+        public String convertToC() {
+            return expr == null ? "return;" : "return " + expr.convertToC() + ";";
+        }
+
+        @Override
+        public String convertToPython() {
+            return expr == null ? "return" : "return " + expr.convertToPython();
+        }
+
         @Override public boolean validateTree() { return true; }
     }
 
@@ -53,9 +65,21 @@ public class StmtNode {
             return id.getToken() + "=" + expr.convertToJott() + ";";
         }
 
-        @Override public String convertToJava(String className) { throw new UnsupportedOperationException("Not implemented: convertToJava"); }
-        @Override public String convertToC() { throw new UnsupportedOperationException("Not implemented: convertToC"); }
-        @Override public String convertToPython() { throw new UnsupportedOperationException("Not implemented: convertToPython"); }
+        @Override
+        public String convertToJava(String className) {
+            return id.getToken() + " = " + expr.convertToJava(className) + ";";
+        }
+
+        @Override
+        public String convertToC() {
+            return id.getToken() + " = " + expr.convertToC() + ";";
+        }
+
+        @Override
+        public String convertToPython() {
+            return id.getToken() + " = " + expr.convertToPython();
+        }
+
         @Override public boolean validateTree() { return true; }
     }
 
@@ -77,9 +101,64 @@ public class StmtNode {
             return funcCall.convertToJott() + ";";
         }
 
-        @Override public String convertToJava(String className) { throw new UnsupportedOperationException("Not implemented: convertToJava"); }
-        @Override public String convertToC() { throw new UnsupportedOperationException("Not implemented: convertToC"); }
-        @Override public String convertToPython() { throw new UnsupportedOperationException("Not implemented: convertToPython"); }
+        @Override
+        public String convertToJava(String className) {
+            if ("print".equals(funcCall.name.getToken())) {
+                return "System.out.println(" + funcCall.params.get(0).convertToJava(className) + ");";
+            }
+            return funcCall.convertToJava(className) + ";";
+        }
+
+        @Override
+        public String convertToC() {
+            if ("print".equals(funcCall.name.getToken())) {
+                return printCStatement(funcCall.params.get(0));
+            }
+            return funcCall.convertToC() + ";";
+        }
+
+        @Override
+        public String convertToPython() {
+            if ("print".equals(funcCall.name.getToken())) {
+                return "print(" + funcCall.params.get(0).convertToPython() + ")";
+            }
+            return funcCall.convertToPython() + "";
+        }
+
         @Override public boolean validateTree() { return true; }
+
+        private String printCStatement(ExpressionNode.ExprNode expr) {
+            String inner = expr.convertToC();
+            String typeHint = inferType(expr);
+            if ("String".equals(typeHint)) {
+                return "printf(\"%s\\n\", " + inner + ");";
+            }
+            if ("Boolean".equals(typeHint)) {
+                return "printf(\"%s\\n\", " + inner + " ? \"True\" : \"False\");";
+            }
+            if ("Double".equals(typeHint)) {
+                return "printf(\"%f\\n\", " + inner + ");";
+            }
+            return "printf(\"%d\\n\", " + inner + ");";
+        }
+
+        private String inferType(ExpressionNode.ExprNode expr) {
+            if (expr == null) return "Integer";
+            if (expr.left instanceof ExpressionNode.StringLiteralNode) return "String";
+            if (expr.left instanceof ExpressionNode.BoolNode) return "Boolean";
+            if (expr.left instanceof ExpressionNode.OperandNode) {
+                ExpressionNode.OperandNode op = (ExpressionNode.OperandNode) expr.left;
+                if (op.numTok != null) {
+                    return op.numTok.getToken().contains(".") ? "Double" : "Integer";
+                }
+                if (op.idTok != null) {
+                    return "Unknown";
+                }
+            }
+            if (expr.op != null) {
+                return expr.op.getTokenType() == TokenType.REL_OP ? "Boolean" : "Integer";
+            }
+            return "Integer";
+        }
     }
 }

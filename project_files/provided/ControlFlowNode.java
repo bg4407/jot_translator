@@ -47,9 +47,48 @@ public class ControlFlowNode {
             return sb.toString();
         }
 
-        @Override public String convertToJava(String className) { throw new UnsupportedOperationException("Not implemented: convertToJava"); }
-        @Override public String convertToC() { throw new UnsupportedOperationException("Not implemented: convertToC"); }
-        @Override public String convertToPython() { throw new UnsupportedOperationException("Not implemented: convertToPython"); }
+        @Override
+        public String convertToJava(String className) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("if (").append(cond.convertToJava(className)).append(") {\n");
+            sb.append(body.convertToJava(className)).append("\n}");
+            for (ElseIfNode ei : elseIfs) {
+                sb.append(" else ").append(ei.convertToJava(className));
+            }
+            if (elseNode != null) {
+                sb.append(" else ").append(elseNode.convertToJava(className));
+            }
+            return sb.toString();
+        }
+
+        @Override
+        public String convertToC() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("if (").append(cond.convertToC()).append(") {\n");
+            sb.append(body.convertToC()).append("\n}");
+            for (ElseIfNode ei : elseIfs) {
+                sb.append(" else ").append(ei.convertToC());
+            }
+            if (elseNode != null) {
+                sb.append(" else ").append(elseNode.convertToC());
+            }
+            return sb.toString();
+        }
+
+        @Override
+        public String convertToPython() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("if ").append(cond.convertToPython()).append(":\n");
+            sb.append(body.convertToPython(1));
+            for (ElseIfNode ei : elseIfs) {
+                sb.append("\nelif ").append(ei.convertToPython());
+            }
+            if (elseNode != null) {
+                sb.append("\nelse:\n").append(elseNode.convertToPython(1));
+            }
+            return sb.toString();
+        }
+
         @Override public boolean validateTree() { return true; }
     }
 
@@ -75,9 +114,21 @@ public class ControlFlowNode {
             return "Elseif[" + cond.convertToJott() + "]{" + body.convertToJott() + "}";
         }
 
-        @Override public String convertToJava(String className) { throw new UnsupportedOperationException("Not implemented: convertToJava"); }
-        @Override public String convertToC() { throw new UnsupportedOperationException("Not implemented: convertToC"); }
-        @Override public String convertToPython() { throw new UnsupportedOperationException("Not implemented: convertToPython"); }
+        @Override
+        public String convertToJava(String className) {
+            return "if (" + cond.convertToJava(className) + ") {\n" + body.convertToJava(className) + "\n}";
+        }
+
+        @Override
+        public String convertToC() {
+            return "if (" + cond.convertToC() + ") {\n" + body.convertToC() + "\n}";
+        }
+
+        @Override
+        public String convertToPython() {
+            return cond.convertToPython() + ":\n" + body.convertToPython(1);
+        }
+
         @Override public boolean validateTree() { return true; }
     }
 
@@ -101,9 +152,21 @@ public class ControlFlowNode {
             return "Else{" + body.convertToJott() + "}";
         }
 
-        @Override public String convertToJava(String className) { throw new UnsupportedOperationException("Not implemented: convertToJava"); }
-        @Override public String convertToC() { throw new UnsupportedOperationException("Not implemented: convertToC"); }
-        @Override public String convertToPython() { throw new UnsupportedOperationException("Not implemented: convertToPython"); }
+        @Override
+        public String convertToJava(String className) {
+            return "{\n" + body.convertToJava(className) + "\n}";
+        }
+
+        @Override
+        public String convertToC() {
+            return "{\n" + body.convertToC() + "\n}";
+        }
+
+        public String convertToPython(int indentLevel) {
+            return body.convertToPython(indentLevel);
+        }
+
+        @Override public String convertToPython() { return body.convertToPython(0); }
         @Override public boolean validateTree() { return true; }
     }
 
@@ -129,9 +192,21 @@ public class ControlFlowNode {
             return "While[" + cond.convertToJott() + "]{" + body.convertToJott() + "}";
         }
 
-        @Override public String convertToJava(String className) { throw new UnsupportedOperationException("Not implemented: convertToJava"); }
-        @Override public String convertToC() { throw new UnsupportedOperationException("Not implemented: convertToC"); }
-        @Override public String convertToPython() { throw new UnsupportedOperationException("Not implemented: convertToPython"); }
+        @Override
+        public String convertToJava(String className) {
+            return "while (" + cond.convertToJava(className) + ") {\n" + body.convertToJava(className) + "\n}";
+        }
+
+        @Override
+        public String convertToC() {
+            return "while (" + cond.convertToC() + ") {\n" + body.convertToC() + "\n}";
+        }
+
+        @Override
+        public String convertToPython() {
+            return "while " + cond.convertToPython() + ":\n" + body.convertToPython(1);
+        }
+
         @Override public boolean validateTree() { return true; }
     }
 }

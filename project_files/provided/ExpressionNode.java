@@ -40,9 +40,69 @@ public class ExpressionNode {
             return sb.toString();
         }
 
-        @Override public String convertToJava(String className) { throw new UnsupportedOperationException("Not implemented: convertToJava"); }
-        @Override public String convertToC() { throw new UnsupportedOperationException("Not implemented: convertToC"); }
-        @Override public String convertToPython() { throw new UnsupportedOperationException("Not implemented: convertToPython"); }
+        @Override
+        public String convertToJava(String className) {
+            if ("print".equals(name.getToken())) {
+                return "System.out.println(" + params.get(0).convertToJava(className) + ")";
+            }
+            if ("concat".equals(name.getToken())) {
+                return params.get(0).convertToJava(className) + " + " + params.get(1).convertToJava(className);
+            }
+            if ("length".equals(name.getToken())) {
+                return params.get(0).convertToJava(className) + ".length()";
+            }
+            StringBuilder sb = new StringBuilder();
+            sb.append(name.getToken()).append("(");
+            for (int i = 0; i < params.size(); i++) {
+                if (i > 0) sb.append(", ");
+                sb.append(params.get(i).convertToJava(className));
+            }
+            sb.append(")");
+            return sb.toString();
+        }
+
+        @Override
+        public String convertToC() {
+            if ("print".equals(name.getToken())) {
+                return "printf(\"%s\\n\", " + params.get(0).convertToC() + ")";
+            }
+            if ("concat".equals(name.getToken())) {
+                return "strcat(" + params.get(0).convertToC() + ", " + params.get(1).convertToC() + ")";
+            }
+            if ("length".equals(name.getToken())) {
+                return "strlen(" + params.get(0).convertToC() + ")";
+            }
+            StringBuilder sb = new StringBuilder();
+            sb.append(name.getToken()).append("(");
+            for (int i = 0; i < params.size(); i++) {
+                if (i > 0) sb.append(", ");
+                sb.append(params.get(i).convertToC());
+            }
+            sb.append(")");
+            return sb.toString();
+        }
+
+        @Override
+        public String convertToPython() {
+            if ("print".equals(name.getToken())) {
+                return "print(" + params.get(0).convertToPython() + ")";
+            }
+            if ("concat".equals(name.getToken())) {
+                return params.get(0).convertToPython() + " + " + params.get(1).convertToPython();
+            }
+            if ("length".equals(name.getToken())) {
+                return "len(" + params.get(0).convertToPython() + ")";
+            }
+            StringBuilder sb = new StringBuilder();
+            sb.append(name.getToken()).append("(");
+            for (int i = 0; i < params.size(); i++) {
+                if (i > 0) sb.append(", ");
+                sb.append(params.get(i).convertToPython());
+            }
+            sb.append(")");
+            return sb.toString();
+        }
+
         @Override public boolean validateTree() { return true; }
     }
 
@@ -71,9 +131,30 @@ public class ExpressionNode {
             return left.convertToJott() + op.getToken() + right.convertToJott();
         }
 
-        @Override public String convertToJava(String className) { throw new UnsupportedOperationException("Not implemented: convertToJava"); }
-        @Override public String convertToC() { throw new UnsupportedOperationException("Not implemented: convertToC"); }
-        @Override public String convertToPython() { throw new UnsupportedOperationException("Not implemented: convertToPython"); }
+        @Override
+        public String convertToJava(String className) {
+            if (op == null) {
+                return left.convertToJava(className);
+            }
+            return left.convertToJava(className) + " " + op.getToken() + " " + right.convertToJava(className);
+        }
+
+        @Override
+        public String convertToC() {
+            if (op == null) {
+                return left.convertToC();
+            }
+            return left.convertToC() + " " + op.getToken() + " " + right.convertToC();
+        }
+
+        @Override
+        public String convertToPython() {
+            if (op == null) {
+                return left.convertToPython();
+            }
+            return left.convertToPython() + " " + op.getToken() + " " + right.convertToPython();
+        }
+
         @Override public boolean validateTree() { return true; }
     }
 
@@ -121,9 +202,39 @@ public class ExpressionNode {
             return idTok.getToken();
         }
 
-        @Override public String convertToJava(String className) { throw new UnsupportedOperationException("Not implemented: convertToJava"); }
-        @Override public String convertToC() { throw new UnsupportedOperationException("Not implemented: convertToC"); }
-        @Override public String convertToPython() { throw new UnsupportedOperationException("Not implemented: convertToPython"); }
+        @Override
+        public String convertToJava(String className) {
+            if (funcCall != null) {
+                return funcCall.convertToJava(className);
+            }
+            if (numTok != null) {
+                return (minusTok != null ? "-" : "") + numTok.getToken();
+            }
+            return idTok.getToken();
+        }
+
+        @Override
+        public String convertToC() {
+            if (funcCall != null) {
+                return funcCall.convertToC();
+            }
+            if (numTok != null) {
+                return (minusTok != null ? "-" : "") + numTok.getToken();
+            }
+            return idTok.getToken();
+        }
+
+        @Override
+        public String convertToPython() {
+            if (funcCall != null) {
+                return funcCall.convertToPython();
+            }
+            if (numTok != null) {
+                return (minusTok != null ? "-" : "") + numTok.getToken();
+            }
+            return idTok.getToken();
+        }
+
         @Override public boolean validateTree() { return true; }
     }
 
@@ -145,9 +256,21 @@ public class ExpressionNode {
             return tok.getToken();
         }
 
-        @Override public String convertToJava(String className) { throw new UnsupportedOperationException("Not implemented: convertToJava"); }
-        @Override public String convertToC() { throw new UnsupportedOperationException("Not implemented: convertToC"); }
-        @Override public String convertToPython() { throw new UnsupportedOperationException("Not implemented: convertToPython"); }
+        @Override
+        public String convertToJava(String className) {
+            return tok.getToken();
+        }
+
+        @Override
+        public String convertToC() {
+            return tok.getToken();
+        }
+
+        @Override
+        public String convertToPython() {
+            return tok.getToken();
+        }
+
         @Override public boolean validateTree() { return true; }
     }
 
@@ -169,9 +292,21 @@ public class ExpressionNode {
             return tok.getToken();
         }
 
-        @Override public String convertToJava(String className) { return ""; }
-        @Override public String convertToC() { return ""; }
-        @Override public String convertToPython() { return ""; }
+        @Override
+        public String convertToJava(String className) {
+            return "True".equals(tok.getToken()) ? "true" : "false";
+        }
+
+        @Override
+        public String convertToC() {
+            return "True".equals(tok.getToken()) ? "true" : "false";
+        }
+
+        @Override
+        public String convertToPython() {
+            return tok.getToken();
+        }
+
         @Override public boolean validateTree() { return true; }
     }
 }
