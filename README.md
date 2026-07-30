@@ -72,6 +72,7 @@ java -cp bin provided.Jott <input.jott> <output_file> <Jott|Java|C|Python>
 
 **Tokenizer Tests**: 12/12 
 **Parser Tests**: 30/30 
+**Phase 3 Tests**: 19/19
 
 ## Architecture Notes
 
